@@ -5,6 +5,7 @@ import org.ini4j.Ini;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Set;
 
 class VocabList {
@@ -58,12 +59,12 @@ class VocabList {
 	Ini getListIni() { return listIni; }
 
 	File getFile() { return file; }
-	
+
 	VocabList(String filePath) {
 		try {
 			file = new File(filePath);
 			listIni.load(file);
-			Set<String> sectionNameList = listIni.keySet();
+			Set<String> sectionNameList = new HashSet<>(listIni.keySet());
 
 			//region Get starting_perfect_tries_req and max_perfect_tries_req
 			int startingPerfectTriesReq = -Integer.parseInt(listIni.fetch("preferences", "starting_perfect_tries_req"));
@@ -72,14 +73,14 @@ class VocabList {
 
 			//region Add all morphs with score < 0 to morphList
 			for (String section : sectionNameList) {
-				if (!section.equals("preferences")) {
-					if (listIni.fetch(section, "score") == null) {
-						listIni.put(section, "score", startingPerfectTriesReq);
+				if (!section.equals("preferences") && !section.equals("score")) {
+					if (listIni.fetch("score", section) == null) {
+						listIni.put("score", section, startingPerfectTriesReq);
 						listIni.store(file);
 					}
 
-					if (Integer.parseInt(listIni.fetch(section, "score")) < 0) {
-						morphList.add(new Morph(section, listIni.fetch(section, "morphdef"), listIni.fetch(section, "word1"), listIni.fetch(section, "word1def"), listIni.fetch(section, "word2"), listIni.fetch(section, "word2def"), Integer.parseInt(listIni.fetch(section, "score"))));
+					if (Integer.parseInt(listIni.fetch("score", section)) < 0) {
+						morphList.add(new Morph(section, listIni.fetch(section, "morphdef"), listIni.fetch(section, "word1"), listIni.fetch(section, "word1def"), listIni.fetch(section, "word2"), listIni.fetch(section, "word2def"), Integer.parseInt(listIni.fetch("score", section))));
 					}
 				}
 			}

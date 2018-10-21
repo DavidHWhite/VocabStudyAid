@@ -1,0 +1,10 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="VocabStudy:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/VocabStudy_jar</output-path>
+    <root id="archive" name="VocabStudy.jar">
+      <element id="module-output" name="VocabStudy" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/jetbrains/annotations/16.0.2/annotations-16.0.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Documents/Java Libraries/ini4j-0.5.4/ini4j-0.5.4.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>

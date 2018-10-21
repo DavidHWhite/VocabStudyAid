@@ -8,17 +8,21 @@ import java.util.Random;
 import java.util.Scanner;
 
 public class Main {
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException, InterruptedException {
 		//Create scanner looking for text input from user
 		Scanner scan = new Scanner(System.in);
 
-		System.out.println("What list do you want to use?");
-		String s = scan.nextLine();
+		String s;
+		if (args.length == 0) {
+			System.out.println("What is the name of the list you'd like to use?");
+			s = scan.nextLine();
+		} else
+			s = args[0];
 
 		VocabList vocabList = new VocabList(s + ".ini");
 
 		while (vocabList.getMorphList().size() != 0) {
-			System.out.println();
+			new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
 			quiz(vocabList, scan, vocabList.getMaxTries());
 		}
 	}
@@ -77,15 +81,11 @@ public class Main {
 			//region Ask for and check the word's definition
 			System.out.print("Correct!");
 			System.out.print(" Do you know this word's definition? Press enter once you've thought of it.");
-			//region Wait for enter keypress
-			try {//noinspection ResultOfMethodCallIgnored
-				System.in.read();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			//endregion
-			System.out.println("The actual definition is \"" + quizSubject.getWordDef(prevWord) + "\". Did you get it right? (y/n)");
-			if (scan.nextLine().toLowerCase().equals("y")) {
+			scan.nextLine();
+
+			System.out.print("The definition is \"" + quizSubject.getWordDef(prevWord) + "\". Did you get it right? (y/n) ");
+			String in = scan.nextLine();
+			if (in.toLowerCase().equals("y")) {
 				System.out.println("Great job!");
 			} else {
 				System.out.println("Make sure you remember next time!");
@@ -99,7 +99,7 @@ public class Main {
 		//region If no mistakes were made, increase score by 1
 		if (isEverythingPerfect) {
 			quizSubject.score++;
-			vocabList.getListIni().put(quizSubject.morph, "score", quizSubject.score);
+			vocabList.getListIni().put("score", quizSubject.morph, quizSubject.score);
 			try {
 				vocabList.getListIni().store(vocabList.getFile());
 			} catch (IOException e) {
@@ -112,13 +112,16 @@ public class Main {
 		if (quizSubject.score >= 0)
 			morphs.remove(quizSubject);
 		//endregion
+
+		System.out.println("Press enter to continue...");
+		scan.nextLine();
 	}
 
 	private static void changeScore(boolean isCorrect, VocabList.Morph quizSubject, VocabList vocabList, int maxTries) {
 		try {
 			if (isCorrect) {
 				quizSubject.score = Math.max(maxTries, --quizSubject.score);
-				vocabList.getListIni().put(quizSubject.morph, "score", quizSubject.score);
+				vocabList.getListIni().put("score", quizSubject.morph, quizSubject.score);
 				vocabList.getListIni().store(vocabList.getFile());
 			}
 		} catch (IOException e) {
